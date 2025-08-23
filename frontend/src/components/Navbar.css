@@ -1,0 +1,39 @@
+.navbar {
+    background-color: var(--card-bg);
+    padding: 1rem 0;
+}
+
+.nav-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--accent-color);
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 1.5rem;
+}
+
+.nav-links li a {
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+.nav-links li a:hover {
+    color: var(--accent-color);
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .nav-links {
+        gap: 1rem;
+        font-size: 0.9rem;
+    }
+}
