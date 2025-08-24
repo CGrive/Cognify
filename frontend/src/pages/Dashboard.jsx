@@ -24,7 +24,7 @@ export default function Dashboard() {
             style.innerHTML = `
       .dashboard-root{ display:flex; gap:20px; align-items:flex-start; padding:20px 0; }
       .dashboard-root .sidebar{ width:260px; background:var(--card-bg,#1e1e1e); border-radius:10px; padding:18px; height:calc(100vh - 120px); position:sticky; top:20px; box-shadow: 0 8px 20px rgba(0,0,0,0.6); transition: transform 260ms ease, opacity 260ms ease; }
-      .sidebar.closed{ transform: translateX(-110%); opacity:0; }
+      .sidebar.closed{ transform: translateX(-110%); opacity:0;position:absolute;}
       .sidebar .brand{ display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
       .sidebar .brand h2{ color:var(--accent-color,#4cafef); font-size:1.2rem; }
       .sidebar nav ul{ list-style:none; padding:0; margin-top:8px; display:flex; flex-direction:column; gap:8px; }
