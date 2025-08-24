@@ -18,6 +18,10 @@ body {
   background-color: var(--bg-color);
   color: var(--text-color);
   min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
@@ -34,7 +38,7 @@ a:hover {
 
 /* Container */
 .container {
-  width: 90%;
+  width: 100%;
   max-width: 1200px;
   margin: auto;
 }
