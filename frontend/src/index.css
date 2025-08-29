@@ -1,23 +1,8 @@
-/* Global dark theme variables */
-:root {
-  --bg-color: #121212;
-  --text-color: #f5f5f5;
-  --accent-color: #4cafef;
-  --accent-hover: #3790d4;
-  --card-bg: #1e1e1e;
-}
-
+/* Keep only global layout helpers */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-}
-
-body {
-  font-family: Arial, sans-serif;
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  min-height: 100vh;
 }
 
 #root {
@@ -26,33 +11,14 @@ body {
   flex-direction: column;
 }
 
-/* Links */
-a {
-  text-decoration: none;
-  color: var(--accent-color);
-}
-
-a:hover {
-  color: var(--accent-hover);
-}
-
-/* Container */
+/* Container helper */
 .container {
   width: 100%;
   max-width: 1200px;
   margin: auto;
 }
 
-/* Buttons */
-button {
-  background-color: var(--accent-color);
-  color: white;
-  padding: 0.6rem 1.2rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: var(--accent-hover);
+/* Optional link overrides */
+a {
+  text-decoration: none;
 }

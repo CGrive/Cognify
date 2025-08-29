@@ -1,235 +1,487 @@
-/*
-  Dashboard.jsx
-  A responsive, polished dashboard layout for Cognify.
+// Dashboard.jsx
+import React, { useState } from "react";
+import {
+    Box,
+    CssBaseline,
+    Drawer,
+    AppBar,
+    Toolbar,
+    Typography,
+    IconButton,
+    List,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+    Divider,
+    Grid,
+    Card,
+    CardContent,
+    Button,
+    Badge,
+    Menu,
+    MenuItem,
+    Avatar,
+    TextField,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    Stack,
+    ListItem,
+} from "@mui/material";
 
-  Usage:
-  - Save this file as src/pages/Dashboard.jsx
-  - Ensure your project has the global CSS variables (e.g. --card-bg, --accent-color) from src/index.css
-  - Import and use <Dashboard /> in your router for the /dashboard route
+import {
+    Menu as MenuIcon,
+    Dashboard as DashboardIcon,
+    Description as DescriptionIcon,
+    Article as ArticleIcon,
+    Settings as SettingsIcon,
+    Notifications as NotificationsIcon,
+    Add as AddIcon,
+    Send as SendIcon,
+    Logout as LogoutIcon,
+    AccountCircle as AccountCircleIcon,
+} from "@mui/icons-material";
 
-  This is a single-file component that injects its own CSS at runtime so you can drop it in without extra files.
-*/
+import { useNavigate } from "react-router-dom";
 
-import React, { useEffect, useState } from 'react';
+const drawerWidth = 240;
 
 export default function Dashboard() {
-    const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 900);
+    const navigate = useNavigate();
 
-    useEffect(() => {
-        // inject styles once
-        const styleId = 'cognify-dashboard-styles';
-        if (!document.getElementById(styleId)) {
-            const style = document.createElement('style');
-            style.id = styleId;
-            style.innerHTML = `
-      .dashboard-root{ display:flex; gap:20px; align-items:flex-start; padding:20px 0; }
-      .dashboard-root .sidebar{ width:260px; background:var(--card-bg,#1e1e1e); border-radius:10px; padding:18px; height:calc(100vh - 120px); position:sticky; top:20px; box-shadow: 0 8px 20px rgba(0,0,0,0.6); transition: transform 260ms ease, opacity 260ms ease; }
-      .sidebar.closed{ transform: translateX(-110%); opacity:0;position:absolute;}
-      .sidebar .brand{ display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
-      .sidebar .brand h2{ color:var(--accent-color,#4cafef); font-size:1.2rem; }
-      .sidebar nav ul{ list-style:none; padding:0; margin-top:8px; display:flex; flex-direction:column; gap:8px; }
-      .sidebar nav a{ color:var(--text-color,#fff); padding:10px 8px; display:block; border-radius:6px; font-weight:500; }
-      .sidebar nav a:hover{ background: rgba(255,255,255,0.03); color:var(--accent-color,#4cafef); }
-      .sidebar .profile{ margin-top:auto; display:flex; gap:10px; align-items:center; padding-top:12px; border-top:1px solid rgba(255,255,255,0.03); }
-      .avatar{ width:44px; height:44px; border-radius:10px; background:linear-gradient(135deg,#334155,#0f1720); display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; }
+    // states
+    const [page, setPage] = useState("overview");
+    const [mobileOpen, setMobileOpen] = useState(false);
 
-      .main-area{ flex:1; min-width:0; }
-      .main-header{ display:flex; gap:12px; align-items:center; justify-content:space-between; margin-bottom:18px; }
-      .left-controls{ display:flex; gap:12px; align-items:center; }
-      .hamburger{ background:transparent; border:1px solid rgba(255,255,255,0.06); padding:8px; border-radius:8px; cursor:pointer; font-size:18px; }
-      .searchbox{ background:var(--card-bg,#1e1e1e); padding:8px 12px; border-radius:10px; display:flex; gap:8px; align-items:center; border:1px solid rgba(255,255,255,0.03); }
-      .searchbox input{ background:transparent; border:0; outline:none; color:var(--text-color,#fff); width:260px; }
-      .header-actions{ display:flex; gap:10px; align-items:center; }
+    const [projects, setProjects] = useState([
+        { id: 1, title: "Research on AI (Draft)", status: "Draft" },
+        { id: 2, title: "Climate Data Analysis", status: "Completed" },
+        { id: 3, title: "Quantum Computing Notes", status: "Ongoing" },
+    ]);
 
-      .overview-grid{ display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:12px; margin-bottom:18px; }
-      .overview-card{ background:var(--card-bg,#1e1e1e); padding:14px; border-radius:10px; box-shadow: 0 6px 16px rgba(0,0,0,0.45); }
-      .overview-card h4{ margin-bottom:8px; }
-      .overview-card .big{ font-size:1.4rem; font-weight:700; }
+    const [posts, setPosts] = useState([
+        { id: 1, author: "John", text: "Published initial draft on NLP.", time: "3h ago" },
+    ]);
+    const [newPostText, setNewPostText] = useState("");
 
-      .content-grid{ display:grid; grid-template-columns: 2fr 1fr; gap:12px; }
-      .card{ background:var(--card-bg,#1e1e1e); padding:14px; border-radius:10px; box-shadow: 0 6px 18px rgba(0,0,0,0.45); }
+    const [notifications, setNotifications] = useState([
+        { id: 1, text: "Anna commented on your project", time: "1d ago", read: false },
+        { id: 2, text: "Your dataset finished uploading", time: "2d ago", read: false },
+    ]);
 
-      .projects-list{ list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px; }
-      .project-item{ display:flex; justify-content:space-between; gap:12px; align-items:center; padding:10px; border-radius:8px; background: linear-gradient(180deg, rgba(255,255,255,0.01), transparent); }
-      .project-meta{ display:flex; gap:12px; align-items:center; }
-      .project-title{ font-weight:600; }
-      .project-actions button{ margin-left:8px; padding:6px 10px; border-radius:6px; border:0; cursor:pointer; }
+    const [projectDialogOpen, setProjectDialogOpen] = useState(false);
+    const [newProjectTitle, setNewProjectTitle] = useState("");
+    const [newProjectStatus, setNewProjectStatus] = useState("Draft");
 
-      .tools-grid{ display:flex; gap:8px; flex-wrap:wrap; }
-      .tool-btn{ padding:10px 12px; border-radius:8px; background: rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.03); cursor:pointer; }
+    const [anchorElNotif, setAnchorElNotif] = useState(null);
+    const [anchorElAvatar, setAnchorElAvatar] = useState(null);
 
-      .activity-list{ list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px; }
-      .activity-item{ padding:10px; border-radius:8px; background: linear-gradient(180deg, rgba(255,255,255,0.01), transparent); }
+    const unreadCount = notifications.filter((n) => !n.read).length;
 
-      /* small screens */
-      @media (max-width: 900px){
-        .dashboard-root{ padding:12px 0; }
-        .dashboard-root .sidebar{ position:fixed; left:12px; top:80px; z-index:1200; height:calc(100vh - 100px); }
-        .overview-grid{ grid-template-columns: repeat(2,1fr); }
-        .content-grid{ grid-template-columns: 1fr; }
-        .searchbox input{ width:140px; }
-      }
+    // handlers
+    const handleDrawerToggle = () => setMobileOpen((s) => !s);
+    const handleSelectPage = (p) => {
+        setPage(p);
+        setMobileOpen(false);
+    };
 
-      @media (max-width: 520px){
-        .overview-grid{ grid-template-columns: 1fr; }
-        .searchbox input{ width:100px; }
-      }
-      `;
-            document.head.appendChild(style);
-        }
-
-        // close sidebar on small screens when resizing
-        const onResize = () => {
-            if (window.innerWidth <= 900) setSidebarOpen(false);
-            else setSidebarOpen(true);
+    const handleAddProject = () => {
+        if (!newProjectTitle.trim()) return;
+        const next = {
+            id: Date.now(),
+            title: newProjectTitle.trim(),
+            status: newProjectStatus,
         };
-        window.addEventListener('resize', onResize);
-        return () => window.removeEventListener('resize', onResize);
-    }, []);
+        setProjects((prev) => [next, ...prev]);
+        setNewProjectTitle("");
+        setNewProjectStatus("Draft");
+        setProjectDialogOpen(false);
+        navigate(`/app/editor/${next.id}`);
+    };
 
-    const mockProjects = [
-        { id: 1, title: 'Deep Learning in NLP', updated: '2 days ago', progress: 48 },
-        { id: 2, title: 'Survey on Transformer Models', updated: '1 week ago', progress: 72 },
-        { id: 3, title: 'Data Analysis of Climate CSV', updated: '3 weeks ago', progress: 23 },
-    ];
+    const handleCreatePost = () => {
+        if (!newPostText.trim()) return;
+        const post = { id: Date.now(), author: "You", text: newPostText.trim(), time: "just now" };
+        setPosts((p) => [post, ...p]);
+        setNewPostText("");
+    };
 
-    const mockActivities = [
-        { id: 1, text: 'You published a draft: "Experimental Results on X"', time: '3h' },
-        { id: 2, text: 'Anna commented on your project: "Great findings!"', time: '1d' },
-        { id: 3, text: 'You ran summarizer on "Transformer paper"', time: '2d' },
-    ];
+    const handleLogout = () => navigate("/", { replace: true });
+
+    const openNotifMenu = (e) => setAnchorElNotif(e.currentTarget);
+    const closeNotifMenu = () => setAnchorElNotif(null);
+    const openAvatarMenu = (e) => setAnchorElAvatar(e.currentTarget);
+    const closeAvatarMenu = () => setAnchorElAvatar(null);
+    const markAllNotificationsRead = () => {
+        setNotifications((n) => n.map((x) => ({ ...x, read: true })));
+    };
+
+    // Sidebar
+    const drawer = (
+        <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+            <Toolbar>
+                <Typography variant="h6" noWrap sx={{ fontWeight: 700 }}>
+                    Cognify
+                </Typography>
+            </Toolbar>
+            <Divider />
+            <List>
+                {[
+                    { key: "overview", label: "Overview", icon: <DashboardIcon /> },
+                    { key: "projects", label: "My Projects", icon: <DescriptionIcon /> },
+                    { key: "feed", label: "Feed", icon: <ArticleIcon /> },
+                    { key: "settings", label: "Settings", icon: <SettingsIcon /> },
+                ].map((item) => (
+                    <ListItemButton
+                        key={item.key}
+                        selected={page === item.key}
+                        onClick={() => handleSelectPage(item.key)}
+                        sx={{
+                            borderRadius: 1,
+                            mx: 1,
+                            mb: 0.5,
+                            "&.Mui-selected": {
+                                bgcolor: "primary.main",
+                                color: "#fff",
+                                "& .MuiListItemIcon-root": { color: "#fff" },
+                            },
+                            "&:hover": { bgcolor: "primary.light", color: "#fff" },
+                        }}
+                    >
+                        <ListItemIcon>{item.icon}</ListItemIcon>
+                        <ListItemText primary={item.label} />
+                    </ListItemButton>
+                ))}
+            </List>
+
+            <Box sx={{ flexGrow: 1 }} />
+            <Divider />
+            <List>
+                <ListItemButton onClick={handleLogout}>
+                    <ListItemIcon>
+                        <LogoutIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Logout" />
+                </ListItemButton>
+            </List>
+        </Box>
+    );
+
+    // Pages
+    const Overview = (
+        <Box>
+            <Grid container spacing={3} mb={3}>
+                <Grid container spacing={3} mb={3}>
+                    <Grid item xs={12} sm={6}>
+                        <Card sx={{ height: "100%" }}>
+                            <CardContent sx={{ textAlign: "center", py: 3 }}>
+                                <DashboardIcon color="primary" sx={{ fontSize: 40, mb: 1 }} />
+                                <Typography variant="subtitle2" color="text.secondary">
+                                    Projects
+                                </Typography>
+                                <Typography variant="h4" sx={{ fontWeight: 700 }}>
+                                    {projects.length}
+                                </Typography>
+                            </CardContent>
+                        </Card>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6}>
+                        <Card sx={{ height: "100%" }}>
+                            <CardContent sx={{ textAlign: "center", py: 3 }}>
+                                <StorageIcon color="secondary" sx={{ fontSize: 40, mb: 1 }} />
+                                <Typography variant="subtitle2" color="text.secondary">
+                                    Storage
+                                </Typography>
+                                <Typography variant="h4" sx={{ fontWeight: 700 }}>
+                                    3.2 GB
+                                </Typography>
+                            </CardContent>
+                        </Card>
+                    </Grid>
+                </Grid>
+            </Grid>
+
+            <Grid container spacing={3}>
+                <Grid item xs={12} md={6}>
+                    <Card>
+                        <CardContent>
+                            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                                    Recent Projects
+                                </Typography>
+                                <Button startIcon={<AddIcon />} onClick={() => setProjectDialogOpen(true)}>
+                                    New Project
+                                </Button>
+                            </Box>
+                            <List>
+                                {projects.map((p) => (
+                                    <ListItem key={p.id} disableGutters>
+                                        <ListItemText primary={p.title} secondary={p.status} />
+                                        <Button size="small" onClick={() => navigate(`/app/editor/${p.id}`)}>Open</Button>
+                                    </ListItem>
+                                ))}
+                            </List>
+                        </CardContent>
+                    </Card>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                    <Card>
+                        <CardContent>
+                            <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+                                Recent Activity
+                            </Typography>
+                            <List>
+                                {[
+                                    { id: 1, text: "Published a draft on NLP", time: "3h ago" },
+                                    { id: 2, text: "Commented on 'Transformer Survey'", time: "1d ago" },
+                                    { id: 3, text: "Uploaded dataset Climate-2024.csv", time: "2d ago" },
+                                ].map((a) => (
+                                    <ListItem key={a.id} disableGutters>
+                                        <ListItemText primary={a.text} secondary={a.time} />
+                                    </ListItem>
+                                ))}
+                            </List>
+                        </CardContent>
+                    </Card>
+                </Grid>
+            </Grid>
+        </Box>
+    );
+
+    const ProjectsPage = (
+        <Box>
+            <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+                <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                    My Projects
+                </Typography>
+                <Button variant="contained" startIcon={<AddIcon />} onClick={() => setProjectDialogOpen(true)}>
+                    Create Project
+                </Button>
+            </Box>
+            <Grid container spacing={3}>
+                {projects.map((p) => (
+                    <Grid item xs={12} sm={6} md={4} key={p.id}>
+                        <Card>
+                            <CardContent>
+                                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                                    {p.title}
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary">
+                                    {p.status}
+                                </Typography>
+                                <Box mt={2} display="flex" gap={1}>
+                                    <Button size="small" variant="outlined" onClick={() => navigate(`/app/editor/${p.id}`)}>
+                                        Open
+                                    </Button>
+                                    <Button size="small" color="error" onClick={() => setProjects((prev) => prev.filter((x) => x.id !== p.id))}>
+                                        Remove
+                                    </Button>
+                                </Box>
+                            </CardContent>
+                        </Card>
+                    </Grid>
+                ))}
+            </Grid>
+        </Box>
+    );
+
+    const FeedPage = (
+        <Box>
+            <Typography variant="h5" mb={3} sx={{ fontWeight: 700 }}>
+                Feed
+            </Typography>
+            <Card sx={{ mb: 3 }}>
+                <CardContent>
+                    <Typography variant="subtitle1">Create a post</Typography>
+                    <Box display="flex" gap={1} mt={2}>
+                        <TextField
+                            placeholder="Share something..."
+                            fullWidth
+                            size="small"
+                            value={newPostText}
+                            onChange={(e) => setNewPostText(e.target.value)}
+                        />
+                        <Button variant="contained" endIcon={<SendIcon />} onClick={handleCreatePost}>
+                            Post
+                        </Button>
+                    </Box>
+                </CardContent>
+            </Card>
+            <Stack spacing={2}>
+                {posts.map((p) => (
+                    <Card key={p.id}>
+                        <CardContent>
+                            <Box display="flex" gap={2} alignItems="center" mb={1}>
+                                <Avatar sx={{ bgcolor: "primary.main" }}>{p.author[0]}</Avatar>
+                                <Box>
+                                    <Typography fontWeight={700}>{p.author}</Typography>
+                                    <Typography variant="caption" color="text.secondary">
+                                        {p.time}
+                                    </Typography>
+                                </Box>
+                            </Box>
+                            <Typography>{p.text}</Typography>
+                        </CardContent>
+                    </Card>
+                ))}
+            </Stack>
+        </Box>
+    );
+
+    const SettingsPage = (
+        <Box>
+            <Typography variant="h5" mb={3} sx={{ fontWeight: 700 }}>
+                Settings
+            </Typography>
+            <Card>
+                <CardContent>
+                    <Typography variant="subtitle1">Account</Typography>
+                    <List>
+                        <ListItem disableGutters>
+                            <ListItemText primary="Name" secondary="John Doe" />
+                        </ListItem>
+                        <ListItem disableGutters>
+                            <ListItemText primary="Email" secondary="john@example.com" />
+                        </ListItem>
+                        <ListItem disableGutters>
+                            <ListItemText primary="Role" secondary="Researcher" />
+                        </ListItem>
+                    </List>
+                    <Box mt={2}>
+                        <Button variant="outlined">Change password</Button>
+                        <Button sx={{ ml: 2 }} color="error" startIcon={<LogoutIcon />} onClick={handleLogout}>
+                            Logout
+                        </Button>
+                    </Box>
+                </CardContent>
+            </Card>
+        </Box>
+    );
 
     return (
-        <div className="dashboard-root">
-            <aside className={`sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
-                <div className="brand">
-                    <h2>Cognify</h2>
-                    <button className="hamburger" aria-label="close" onClick={() => setSidebarOpen(false)}>✕</button>
-                </div>
+        <Box sx={{ display: "flex", minHeight: "100vh" }}>
+            <CssBaseline />
 
-                <nav>
-                    <ul>
-                        <li><a href="#">Overview</a></li>
-                        <li><a href="#projects">My Projects</a></li>
-                        <li><a href="#tools">AI Tools</a></li>
-                        <li><a href="#citations">Citations</a></li>
-                        <li><a href="#feed">Social Feed</a></li>
-                        <li><a href="#account">Account</a></li>
-                    </ul>
-                </nav>
+            {/* AppBar */}
+            <AppBar position="fixed" sx={{ ml: { sm: drawerWidth } }}>
+                <Toolbar>
+                    <IconButton color="inherit" edge="start" onClick={handleDrawerToggle} sx={{ mr: 2, display: { sm: "none" } }}>
+                        <MenuIcon />
+                    </IconButton>
 
-                <div className="profile">
-                    <div className="avatar">JD</div>
-                    <div>
-                        <div style={{ fontWeight: 700 }}>John Doe</div>
-                        <div style={{ fontSize: 12, color: 'var(--muted,#9aa4b2)' }}>Researcher • 12 followers</div>
-                    </div>
-                </div>
-            </aside>
+                    <Box sx={{ flexGrow: 1 }}>
+                        <Typography variant="body2" color="text.secondary">
+                            Welcome back,
+                        </Typography>
+                        <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                            John — here’s your workspace
+                        </Typography>
+                    </Box>
 
-            <div className="main-area">
-                <div className="main-header">
-                    <div className="left-controls">
-                        <button className="hamburger" aria-label="open sidebar" onClick={() => setSidebarOpen(s => !s)}>☰</button>
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                            <div style={{ fontSize: 14, color: 'var(--muted,#9aa4b2)' }}>Welcome back,</div>
-                            <div style={{ fontWeight: 800 }}>John — here's your workspace</div>
-                        </div>
-                    </div>
+                    <TextField size="small" placeholder="Search..." sx={{ bgcolor: "background.paper", borderRadius: 1, mr: 2 }} />
 
-                    <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
-                        <div className="searchbox">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 21l-4.35-4.35" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /><circle cx="11" cy="11" r="5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                            <input placeholder="Search projects, tools, papers..." />
-                        </div>
-                    </div>
+                    <IconButton color="inherit" onClick={openNotifMenu}>
+                        <Badge badgeContent={unreadCount} color="error">
+                            <NotificationsIcon />
+                        </Badge>
+                    </IconButton>
 
-                    <div className="header-actions">
-                        <button onClick={() => alert('Create new project (stub)')}>+ New Project</button>
-                        <button onClick={() => alert('Publish (stub)')}>Publish</button>
-                    </div>
-                </div>
+                    <Menu anchorEl={anchorElNotif} open={Boolean(anchorElNotif)} onClose={closeNotifMenu}>
+                        <MenuItem onClick={() => { markAllNotificationsRead(); closeNotifMenu(); }}>
+                            Mark all as read
+                        </MenuItem>
+                        <Divider />
+                        {notifications.length === 0 && <MenuItem disabled>No notifications</MenuItem>}
+                        {notifications.map((n) => (
+                            <MenuItem key={n.id}>
+                                <ListItemText primary={n.text} secondary={n.time} />
+                            </MenuItem>
+                        ))}
+                    </Menu>
 
-                <div className="overview-grid">
-                    <div className="overview-card card">
-                        <h4>Projects</h4>
-                        <div className="big">{mockProjects.length}</div>
-                        <div style={{ marginTop: 8, fontSize: 13, color: 'var(--muted,#9aa4b2)' }}>Active projects</div>
-                    </div>
-                    <div className="overview-card card">
-                        <h4>AI Tools</h4>
-                        <div className="big">5</div>
-                        <div style={{ marginTop: 8, fontSize: 13, color: 'var(--muted,#9aa4b2)' }}>Available</div>
-                    </div>
-                    <div className="overview-card card">
-                        <h4>Followers</h4>
-                        <div className="big">12</div>
-                        <div style={{ marginTop: 8, fontSize: 13, color: 'var(--muted,#9aa4b2)' }}>People following you</div>
-                    </div>
-                    <div className="overview-card card">
-                        <h4>Storage</h4>
-                        <div className="big">3.2 GB</div>
-                        <div style={{ marginTop: 8, fontSize: 13, color: 'var(--muted,#9aa4b2)' }}>Used</div>
-                    </div>
-                </div>
+                    <IconButton color="inherit" onClick={openAvatarMenu} sx={{ ml: 1 }}>
+                        <Avatar sx={{ width: 32, height: 32 }}>JD</Avatar>
+                    </IconButton>
 
-                <div className="content-grid">
-                    <div className="projects-panel card" id="projects">
-                        <h3>My Projects</h3>
-                        <p style={{ color: 'var(--muted,#9aa4b2)', marginBottom: 12 }}>Recent projects — click to open or continue editing.</p>
-                        <ul className="projects-list">
-                            {mockProjects.map(p => (
-                                <li key={p.id} className="project-item">
-                                    <div className="project-meta">
-                                        <div style={{ width: 8, height: 8, borderRadius: 4, background: 'linear-gradient(90deg,#6ee7b7,#4cafef)' }}></div>
-                                        <div>
-                                            <div className="project-title">{p.title}</div>
-                                            <div style={{ fontSize: 12, color: 'var(--muted,#9aa4b2)' }}>{p.updated} • {p.progress}%</div>
-                                        </div>
-                                    </div>
+                    <Menu anchorEl={anchorElAvatar} open={Boolean(anchorElAvatar)} onClose={closeAvatarMenu}>
+                        <MenuItem onClick={() => { handleSelectPage("settings"); closeAvatarMenu(); }}>
+                            <ListItemIcon><AccountCircleIcon fontSize="small" /></ListItemIcon>
+                            Profile
+                        </MenuItem>
+                        <MenuItem onClick={handleLogout}>
+                            <ListItemIcon><LogoutIcon fontSize="small" /></ListItemIcon>
+                            Logout
+                        </MenuItem>
+                    </Menu>
+                </Toolbar>
+            </AppBar>
 
-                                    <div className="project-actions">
-                                        <button onClick={() => alert('Open project: ' + p.title)}>Open</button>
-                                        <button onClick={() => alert('More actions (stub)')}>•••</button>
-                                    </div>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+            {/* Drawer */}
+            <Box component="nav" sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}>
+                <Drawer
+                    variant="temporary"
+                    open={mobileOpen}
+                    onClose={handleDrawerToggle}
+                    ModalProps={{ keepMounted: true }}
+                    sx={{ display: { xs: "block", sm: "none" }, "& .MuiDrawer-paper": { width: drawerWidth } }}
+                >
+                    {drawer}
+                </Drawer>
+                <Drawer
+                    variant="permanent"
+                    sx={{ display: { xs: "none", sm: "block" }, "& .MuiDrawer-paper": { width: drawerWidth, top: 64 } }}
+                    open
+                >
+                    {drawer}
+                </Drawer>
+            </Box>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                        <div className="card" id="tools">
-                            <h3>Quick AI Tools</h3>
-                            <p style={{ color: 'var(--muted,#9aa4b2)' }}>Run tools on selected text or files.</p>
-                            <div className="tools-grid" style={{ marginTop: 8 }}>
-                                <button className="tool-btn" onClick={() => alert('Summarizer (stub)')}>Summarizer</button>
-                                <button className="tool-btn" onClick={() => alert('Data Analysis (stub)')}>Data Analysis</button>
-                                <button className="tool-btn" onClick={() => alert('Hypothesis Validator (stub)')}>Hypothesis Validator</button>
-                                <button className="tool-btn" onClick={() => alert('Originality Checker (stub)')}>Originality Checker</button>
-                                <button className="tool-btn" onClick={() => alert('Find Papers (stub)')}>Find Papers</button>
-                            </div>
-                        </div>
+            {/* Main */}
+            <Box component="main" sx={{ flexGrow: 1, p: { xs: 2, md: 4 }, width: { sm: `calc(100% - ${drawerWidth}px)` } }}>
+                <Toolbar />
+                {page === "overview" && Overview}
+                {page === "projects" && ProjectsPage}
+                {page === "feed" && FeedPage}
+                {page === "settings" && SettingsPage}
+            </Box>
 
-                        <div className="card" id="activity">
-                            <h3>Recent Activity</h3>
-                            <ul className="activity-list">
-                                {mockActivities.map(a => (
-                                    <li key={a.id} className="activity-item">
-                                        <div style={{ fontSize: 13 }}>{a.text}</div>
-                                        <div style={{ fontSize: 12, color: 'var(--muted,#9aa4b2)' }}>{a.time}</div>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
+            {/* Project Dialog */}
+            <Dialog open={projectDialogOpen} onClose={() => setProjectDialogOpen(false)} maxWidth="sm" fullWidth>
+                <DialogTitle>Create New Project</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        label="Project Title"
+                        fullWidth
+                        value={newProjectTitle}
+                        onChange={(e) => setNewProjectTitle(e.target.value)}
+                        sx={{ mb: 2 }}
+                    />
+                    <TextField
+                        label="Status"
+                        fullWidth
+                        value={newProjectStatus}
+                        onChange={(e) => setNewProjectStatus(e.target.value)}
+                        helperText="e.g. Draft, Ongoing, Completed"
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setProjectDialogOpen(false)}>Cancel</Button>
+                    <Button variant="contained" onClick={handleAddProject}>Create</Button>
+                </DialogActions>
+            </Dialog>
+        </Box>
+    );
+}
 
-                        <div className="card" id="stats">
-                            <h3>Quick Stats</h3>
-                            <div style={{ height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted,#9aa4b2)' }}>Mini charts will go here (integration later)</div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
+// StorageIcon (custom SVG)
+function StorageIcon(props) {
+    return (
+        <svg width="24" height="24" viewBox="0 0 24 24" {...props}>
+            <rect x="3" y="3" width="18" height="6" rx="1" />
+            <rect x="3" y="10" width="18" height="6" rx="1" />
+            <rect x="3" y="17" width="18" height="4" rx="1" />
+        </svg>
     );
 }

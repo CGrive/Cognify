@@ -1,6 +1,14 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "./Auth.css";
+import {
+    Box,
+    Paper,
+    Typography,
+    TextField,
+    Button,
+    Alert,
+    Stack
+} from "@mui/material";
 
 function RegisterPage() {
     const navigate = useNavigate();
@@ -26,58 +34,70 @@ function RegisterPage() {
 
         // Simulated registration (replace with backend later)
         console.log("Registered:", formData);
-        navigate("/dashboard"); // auto-login after register
+        navigate("/app/dashboard");// auto-login after register
     };
 
     return (
-        <div className="auth-container">
-            <form className="auth-form" onSubmit={handleSubmit}>
-                <h2>Register</h2>
-                {error && <p className="error">{error}</p>}
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+            <Paper elevation={3} sx={{ p: 4, width: 400 }}>
+                <Typography variant="h5" align="center" gutterBottom>
+                    Register
+                </Typography>
 
-                <label>Name</label>
-                <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                />
+                {error && <Alert severity="error">{error}</Alert>}
 
-                <label>Email</label>
-                <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                />
+                <form onSubmit={handleSubmit}>
+                    <Stack spacing={2}>
+                        <TextField
+                            label="Name"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            fullWidth
+                            required
+                        />
 
-                <label>Password</label>
-                <input
-                    type="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    required
-                />
+                        <TextField
+                            label="Email"
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            fullWidth
+                            required
+                        />
 
-                <label>Confirm Password</label>
-                <input
-                    type="password"
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    required
-                />
+                        <TextField
+                            label="Password"
+                            type="password"
+                            name="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            fullWidth
+                            required
+                        />
 
-                <button type="submit">Sign Up</button>
+                        <TextField
+                            label="Confirm Password"
+                            type="password"
+                            name="confirmPassword"
+                            value={formData.confirmPassword}
+                            onChange={handleChange}
+                            fullWidth
+                            required
+                        />
 
-                <p className="switch-link">
-                    Already have an account? <Link to="/login">Login</Link>
-                </p>
-            </form>
-        </div>
+                        <Button type="submit" variant="contained" fullWidth>
+                            Sign Up
+                        </Button>
+
+                        <Typography variant="body2" align="center">
+                            Already have an account? <Link to="/login">Login</Link>
+                        </Typography>
+                    </Stack>
+                </form>
+            </Paper>
+        </Box>
     );
 }
 

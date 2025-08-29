@@ -1,6 +1,14 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "./Auth.css";
+import {
+    Box,
+    Paper,
+    Typography,
+    TextField,
+    Button,
+    Alert,
+    Stack
+} from "@mui/material";
 
 function LoginPage() {
     const navigate = useNavigate();
@@ -14,45 +22,57 @@ function LoginPage() {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Simulated login (replace with backend API later)
-        if (formData.email === "test@example.com" && formData.password === "123456") {
-            navigate("/dashboard");
+        // Simulated login (replace with backend later)
+        if (formData.email === "test@test.com" && formData.password === "1234") {
+            console.log("Logged in:", formData);
+            navigate("/app/dashboard");
         } else {
             setError("Invalid email or password");
         }
     };
 
     return (
-        <div className="auth-container">
-            <form className="auth-form" onSubmit={handleSubmit}>
-                <h2>Login</h2>
-                {error && <p className="error">{error}</p>}
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+            <Paper elevation={3} sx={{ p: 4, width: 400 }}>
+                <Typography variant="h5" align="center" gutterBottom>
+                    Login
+                </Typography>
 
-                <label>Email</label>
-                <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                />
+                {error && <Alert severity="error">{error}</Alert>}
 
-                <label>Password</label>
-                <input
-                    type="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    required
-                />
+                <form onSubmit={handleSubmit}>
+                    <Stack spacing={2}>
+                        <TextField
+                            label="Email"
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            fullWidth
+                            required
+                        />
 
-                <button type="submit">Login</button>
+                        <TextField
+                            label="Password"
+                            type="password"
+                            name="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            fullWidth
+                            required
+                        />
 
-                <p className="switch-link">
-                    Don't have an account? <Link to="/register">Register</Link>
-                </p>
-            </form>
-        </div>
+                        <Button type="submit" variant="contained" fullWidth>
+                            Login
+                        </Button>
+
+                        <Typography variant="body2" align="center">
+                            Don’t have an account? <Link to="/register">Sign Up</Link>
+                        </Typography>
+                    </Stack>
+                </form>
+            </Paper>
+        </Box>
     );
 }
 
